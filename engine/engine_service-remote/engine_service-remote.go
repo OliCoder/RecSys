@@ -23,6 +23,7 @@ func Usage() {
   fmt.Fprintln(os.Stderr, "Usage of ", os.Args[0], " [-h host:port] [-u url] [-f[ramed]] function [arg1 [arg2...]]:")
   flag.PrintDefaults()
   fmt.Fprintln(os.Stderr, "\nFunctions:")
+  fmt.Fprintln(os.Stderr, "  string Ping()")
   fmt.Fprintln(os.Stderr, "  bool UpdateEngineGroup(string groupConf)")
   fmt.Fprintln(os.Stderr, "  i64 Predict(UserProfile userProfile, i64 movieId)")
   fmt.Fprintln(os.Stderr, "   Recommend(UserProfile userProfile, i32 topk)")
@@ -147,6 +148,14 @@ func main() {
   }
   
   switch cmd {
+  case "Ping":
+    if flag.NArg() - 1 != 0 {
+      fmt.Fprintln(os.Stderr, "Ping requires 0 args")
+      flag.Usage()
+    }
+    fmt.Print(client.Ping(context.Background()))
+    fmt.Print("\n")
+    break
   case "UpdateEngineGroup":
     if flag.NArg() - 1 != 1 {
       fmt.Fprintln(os.Stderr, "UpdateEngineGroup requires 1 args")
@@ -162,25 +171,25 @@ func main() {
       fmt.Fprintln(os.Stderr, "Predict requires 2 args")
       flag.Usage()
     }
-    arg10 := flag.Arg(1)
-    mbTrans11 := thrift.NewTMemoryBufferLen(len(arg10))
-    defer mbTrans11.Close()
-    _, err12 := mbTrans11.WriteString(arg10)
-    if err12 != nil {
+    arg12 := flag.Arg(1)
+    mbTrans13 := thrift.NewTMemoryBufferLen(len(arg12))
+    defer mbTrans13.Close()
+    _, err14 := mbTrans13.WriteString(arg12)
+    if err14 != nil {
       Usage()
       return
     }
-    factory13 := thrift.NewTJSONProtocolFactory()
-    jsProt14 := factory13.GetProtocol(mbTrans11)
+    factory15 := thrift.NewTJSONProtocolFactory()
+    jsProt16 := factory15.GetProtocol(mbTrans13)
     argvalue0 := engine.NewUserProfile()
-    err15 := argvalue0.Read(jsProt14)
-    if err15 != nil {
+    err17 := argvalue0.Read(jsProt16)
+    if err17 != nil {
       Usage()
       return
     }
     value0 := argvalue0
-    argvalue1, err16 := (strconv.ParseInt(flag.Arg(2), 10, 64))
-    if err16 != nil {
+    argvalue1, err18 := (strconv.ParseInt(flag.Arg(2), 10, 64))
+    if err18 != nil {
       Usage()
       return
     }
@@ -193,25 +202,25 @@ func main() {
       fmt.Fprintln(os.Stderr, "Recommend requires 2 args")
       flag.Usage()
     }
-    arg17 := flag.Arg(1)
-    mbTrans18 := thrift.NewTMemoryBufferLen(len(arg17))
-    defer mbTrans18.Close()
-    _, err19 := mbTrans18.WriteString(arg17)
-    if err19 != nil {
+    arg19 := flag.Arg(1)
+    mbTrans20 := thrift.NewTMemoryBufferLen(len(arg19))
+    defer mbTrans20.Close()
+    _, err21 := mbTrans20.WriteString(arg19)
+    if err21 != nil {
       Usage()
       return
     }
-    factory20 := thrift.NewTJSONProtocolFactory()
-    jsProt21 := factory20.GetProtocol(mbTrans18)
+    factory22 := thrift.NewTJSONProtocolFactory()
+    jsProt23 := factory22.GetProtocol(mbTrans20)
     argvalue0 := engine.NewUserProfile()
-    err22 := argvalue0.Read(jsProt21)
-    if err22 != nil {
+    err24 := argvalue0.Read(jsProt23)
+    if err24 != nil {
       Usage()
       return
     }
     value0 := argvalue0
-    tmp1, err23 := (strconv.Atoi(flag.Arg(2)))
-    if err23 != nil {
+    tmp1, err25 := (strconv.Atoi(flag.Arg(2)))
+    if err25 != nil {
       Usage()
       return
     }

@@ -18,7 +18,7 @@ func init() {
 	dbName := config.DBName
 	user := config.User
 	password := config.Password
-	tablePrefix := config.TablePrefix
+	//tablePrefix := config.TablePrefix
 
 	db, err := gorm.Open(dbType, fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		user, password, host, port, dbName))
@@ -26,11 +26,11 @@ func init() {
 		log.Errorf("Fail to init db, err:%s", err)
 	}
 
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return tablePrefix + defaultTableName
-	}
+	//gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
+	//	return tablePrefix + defaultTableName
+	//}
 
-	db.SingularTable(true)
+	//db.SingularTable(true)
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
 }

@@ -3,7 +3,7 @@ module github.com/OliCoder/RecSys
 go 1.12
 
 require (
-	github.com/apache/thrift v0.13.0 // indirect
+	github.com/apache/thrift v0.13.0
 	github.com/appleboy/gin-jwt v2.5.0+incompatible
 	github.com/appleboy/gin-jwt/v2 v2.6.3
 	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e // indirect

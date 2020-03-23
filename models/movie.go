@@ -5,6 +5,4 @@ type Movie struct {
 	Title     string
 	Genre     string
 	AvgRating float32
-	Rating    float32
-	Timestamp int64
 }

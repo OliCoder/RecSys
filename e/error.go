@@ -13,6 +13,8 @@ const (
 	ERROR_NOT_EXIST_MOVIRE = 20001
 
 	PAGE_NOT_FOUND = 40004
+
+	ERROR_RPC_CALL = 50001
 )
 
 var ErrorCodeMsg = map[int]string{
@@ -25,6 +27,7 @@ var ErrorCodeMsg = map[int]string{
 	ERROR_AUTH_TOKEN:               "Generate Token Failed",
 	ERROR_AUTH:                     "Token Error",
 	PAGE_NOT_FOUND:                 "Page Not Found",
+	ERROR_RPC_CALL:                 "Rpc Call Failed",
 }
 
 func GetErrorCodeMsg(code int) string {

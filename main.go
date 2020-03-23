@@ -3,9 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/OliCoder/RecSys/engine"
 	router "github.com/OliCoder/RecSys/router"
 	"github.com/OliCoder/RecSys/settings"
+	log "github.com/sirupsen/logrus"
 	"net/http"
+	"os"
+	"os/signal"
 )
 
 func main() {
@@ -20,4 +24,13 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	server.ListenAndServe()
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, os.Kill)
+	go func() {
+		for s := range c {
+			log.Info("Process Exit with %v", s)
+			engine.ClientTransport.Close()
+			os.Exit(0)
+		}
+	}()
 }

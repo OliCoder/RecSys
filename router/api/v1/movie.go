@@ -9,6 +9,7 @@ import (
 
 func GetMovieLists(c *gin.Context) {
 	var movieLists []models.Movie
+
 	code := e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,

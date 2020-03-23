@@ -146,6 +146,7 @@ func (p *UserProfile) String() string {
 }
 
 type EngineService interface {
+  Ping(ctx context.Context) (r string, err error)
   // Parameters:
   //  - GroupConf
   UpdateEngineGroup(ctx context.Context, groupConf string) (r bool, err error)
@@ -184,27 +185,22 @@ func NewEngineServiceClient(c thrift.TClient) *EngineServiceClient {
 func (p *EngineServiceClient) Client_() thrift.TClient {
   return p.c
 }
-// Parameters:
-//  - GroupConf
-func (p *EngineServiceClient) UpdateEngineGroup(ctx context.Context, groupConf string) (r bool, err error) {
-  var _args0 EngineServiceUpdateEngineGroupArgs
-  _args0.GroupConf = groupConf
-  var _result1 EngineServiceUpdateEngineGroupResult
-  if err = p.Client_().Call(ctx, "UpdateEngineGroup", &_args0, &_result1); err != nil {
+func (p *EngineServiceClient) Ping(ctx context.Context) (r string, err error) {
+  var _args0 EngineServicePingArgs
+  var _result1 EngineServicePingResult
+  if err = p.Client_().Call(ctx, "Ping", &_args0, &_result1); err != nil {
     return
   }
   return _result1.GetSuccess(), nil
 }
 
 // Parameters:
-//  - UserProfile
-//  - MovieId
-func (p *EngineServiceClient) Predict(ctx context.Context, userProfile *UserProfile, movieId int64) (r int64, err error) {
-  var _args2 EngineServicePredictArgs
-  _args2.UserProfile = userProfile
-  _args2.MovieId = movieId
-  var _result3 EngineServicePredictResult
-  if err = p.Client_().Call(ctx, "Predict", &_args2, &_result3); err != nil {
+//  - GroupConf
+func (p *EngineServiceClient) UpdateEngineGroup(ctx context.Context, groupConf string) (r bool, err error) {
+  var _args2 EngineServiceUpdateEngineGroupArgs
+  _args2.GroupConf = groupConf
+  var _result3 EngineServiceUpdateEngineGroupResult
+  if err = p.Client_().Call(ctx, "UpdateEngineGroup", &_args2, &_result3); err != nil {
     return
   }
   return _result3.GetSuccess(), nil
@@ -212,16 +208,30 @@ func (p *EngineServiceClient) Predict(ctx context.Context, userProfile *UserProf
 
 // Parameters:
 //  - UserProfile
-//  - Topk
-func (p *EngineServiceClient) Recommend(ctx context.Context, userProfile *UserProfile, topk int32) (r []int64, err error) {
-  var _args4 EngineServiceRecommendArgs
+//  - MovieId
+func (p *EngineServiceClient) Predict(ctx context.Context, userProfile *UserProfile, movieId int64) (r int64, err error) {
+  var _args4 EngineServicePredictArgs
   _args4.UserProfile = userProfile
-  _args4.Topk = topk
-  var _result5 EngineServiceRecommendResult
-  if err = p.Client_().Call(ctx, "Recommend", &_args4, &_result5); err != nil {
+  _args4.MovieId = movieId
+  var _result5 EngineServicePredictResult
+  if err = p.Client_().Call(ctx, "Predict", &_args4, &_result5); err != nil {
     return
   }
   return _result5.GetSuccess(), nil
+}
+
+// Parameters:
+//  - UserProfile
+//  - Topk
+func (p *EngineServiceClient) Recommend(ctx context.Context, userProfile *UserProfile, topk int32) (r []int64, err error) {
+  var _args6 EngineServiceRecommendArgs
+  _args6.UserProfile = userProfile
+  _args6.Topk = topk
+  var _result7 EngineServiceRecommendResult
+  if err = p.Client_().Call(ctx, "Recommend", &_args6, &_result7); err != nil {
+    return
+  }
+  return _result7.GetSuccess(), nil
 }
 
 type EngineServiceProcessor struct {
@@ -244,11 +254,12 @@ func (p *EngineServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFunc
 
 func NewEngineServiceProcessor(handler EngineService) *EngineServiceProcessor {
 
-  self6 := &EngineServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
-  self6.processorMap["UpdateEngineGroup"] = &engineServiceProcessorUpdateEngineGroup{handler:handler}
-  self6.processorMap["Predict"] = &engineServiceProcessorPredict{handler:handler}
-  self6.processorMap["Recommend"] = &engineServiceProcessorRecommend{handler:handler}
-return self6
+  self8 := &EngineServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
+  self8.processorMap["Ping"] = &engineServiceProcessorPing{handler:handler}
+  self8.processorMap["UpdateEngineGroup"] = &engineServiceProcessorUpdateEngineGroup{handler:handler}
+  self8.processorMap["Predict"] = &engineServiceProcessorPredict{handler:handler}
+  self8.processorMap["Recommend"] = &engineServiceProcessorRecommend{handler:handler}
+return self8
 }
 
 func (p *EngineServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -259,13 +270,61 @@ func (p *EngineServiceProcessor) Process(ctx context.Context, iprot, oprot thrif
   }
   iprot.Skip(thrift.STRUCT)
   iprot.ReadMessageEnd()
-  x7 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
+  x9 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
   oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-  x7.Write(oprot)
+  x9.Write(oprot)
   oprot.WriteMessageEnd()
   oprot.Flush(ctx)
-  return false, x7
+  return false, x9
 
+}
+
+type engineServiceProcessorPing struct {
+  handler EngineService
+}
+
+func (p *engineServiceProcessorPing) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := EngineServicePingArgs{}
+  if err = args.Read(iprot); err != nil {
+    iprot.ReadMessageEnd()
+    x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+    oprot.WriteMessageBegin("Ping", thrift.EXCEPTION, seqId)
+    x.Write(oprot)
+    oprot.WriteMessageEnd()
+    oprot.Flush(ctx)
+    return false, err
+  }
+
+  iprot.ReadMessageEnd()
+  result := EngineServicePingResult{}
+var retval string
+  var err2 error
+  if retval, err2 = p.handler.Ping(ctx); err2 != nil {
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing Ping: " + err2.Error())
+    oprot.WriteMessageBegin("Ping", thrift.EXCEPTION, seqId)
+    x.Write(oprot)
+    oprot.WriteMessageEnd()
+    oprot.Flush(ctx)
+    return true, err2
+  } else {
+    result.Success = &retval
+}
+  if err2 = oprot.WriteMessageBegin("Ping", thrift.REPLY, seqId); err2 != nil {
+    err = err2
+  }
+  if err2 = result.Write(oprot); err == nil && err2 != nil {
+    err = err2
+  }
+  if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+    err = err2
+  }
+  if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+    err = err2
+  }
+  if err != nil {
+    return
+  }
+  return true, err
 }
 
 type engineServiceProcessorUpdateEngineGroup struct {
@@ -414,6 +473,157 @@ var retval []int64
 
 
 // HELPER FUNCTIONS AND STRUCTURES
+
+type EngineServicePingArgs struct {
+}
+
+func NewEngineServicePingArgs() *EngineServicePingArgs {
+  return &EngineServicePingArgs{}
+}
+
+func (p *EngineServicePingArgs) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    if err := iprot.Skip(fieldTypeId); err != nil {
+      return err
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *EngineServicePingArgs) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("Ping_args"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *EngineServicePingArgs) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("EngineServicePingArgs(%+v)", *p)
+}
+
+// Attributes:
+//  - Success
+type EngineServicePingResult struct {
+  Success *string `thrift:"success,0" db:"success" json:"success,omitempty"`
+}
+
+func NewEngineServicePingResult() *EngineServicePingResult {
+  return &EngineServicePingResult{}
+}
+
+var EngineServicePingResult_Success_DEFAULT string
+func (p *EngineServicePingResult) GetSuccess() string {
+  if !p.IsSetSuccess() {
+    return EngineServicePingResult_Success_DEFAULT
+  }
+return *p.Success
+}
+func (p *EngineServicePingResult) IsSetSuccess() bool {
+  return p.Success != nil
+}
+
+func (p *EngineServicePingResult) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 0:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField0(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *EngineServicePingResult)  ReadField0(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 0: ", err)
+} else {
+  p.Success = &v
+}
+  return nil
+}
+
+func (p *EngineServicePingResult) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("Ping_result"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField0(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *EngineServicePingResult) writeField0(oprot thrift.TProtocol) (err error) {
+  if p.IsSetSuccess() {
+    if err := oprot.WriteFieldBegin("success", thrift.STRING, 0); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
+    if err := oprot.WriteString(string(*p.Success)); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err) }
+    if err := oprot.WriteFieldEnd(); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
+  }
+  return err
+}
+
+func (p *EngineServicePingResult) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("EngineServicePingResult(%+v)", *p)
+}
 
 // Attributes:
 //  - GroupConf
@@ -1039,13 +1249,13 @@ func (p *EngineServiceRecommendResult)  ReadField0(iprot thrift.TProtocol) error
   tSlice := make([]int64, 0, size)
   p.Success =  tSlice
   for i := 0; i < size; i ++ {
-var _elem8 int64
+var _elem10 int64
     if v, err := iprot.ReadI64(); err != nil {
     return thrift.PrependError("error reading field 0: ", err)
 } else {
-    _elem8 = v
+    _elem10 = v
 }
-    p.Success = append(p.Success, _elem8)
+    p.Success = append(p.Success, _elem10)
   }
   if err := iprot.ReadListEnd(); err != nil {
     return thrift.PrependError("error reading list end: ", err)
