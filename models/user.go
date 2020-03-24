@@ -2,11 +2,11 @@ package models
 
 type User struct {
 	Name       string
-	UserId     int64
+	UserId     int64 `gorm:"column:userid"`
 	Age        int32
 	Gender     string
 	Occupation int
-	ZipCode    int
+	ZipCode    int `gorm:"column:zipcode"`
 }
 
 var OccupationStatus = map[int]string{
@@ -45,4 +45,8 @@ func GetUserInfo(userName string) (user User) {
 	userId := GetUserId(userName)
 	db.Where("userid = ?", userId).First(&user)
 	return
+}
+
+func UpdateUserInfo(user User) {
+	db.Save(&user)
 }

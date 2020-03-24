@@ -21,8 +21,10 @@ func InitRouter() *gin.Engine {
 		auth.GET("refresh_token", authMiddleware.RefreshHandler)
 	}
 	user := router.Group("/user")
+	user.Use(authMiddleware.MiddlewareFunc())
 	{
 		user.GET("/info", v1.GetUserInfo)
+		user.PUT("/info", v1.UpdateUserInfo)
 		user.POST("/logout", v1.Logout)
 	}
 	api := router.Group("/api/v1")

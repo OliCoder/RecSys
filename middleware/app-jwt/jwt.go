@@ -1,6 +1,7 @@
 package app_jwt
 
 import (
+	"encoding/json"
 	"github.com/OliCoder/RecSys/e"
 	"github.com/OliCoder/RecSys/models"
 	"github.com/OliCoder/RecSys/settings"
@@ -19,9 +20,10 @@ func GinJWTMiddlewareInit(jwtAuthorizator JwtAuthorizator) (authMiddleware *jwt.
 		Realm:            "jwt middleware",
 		SigningAlgorithm: "",
 		Key:              []byte("secret key"),
-		Timeout:          time.Minute * 5,
+		Timeout:          time.Hour * 5,
 		MaxRefresh:       time.Hour,
 		Authenticator: func(c *gin.Context) (interface{}, error) {
+			log.Infof("gin context:%#v", c)
 			var loginVal models.Auth
 			if err := c.ShouldBind(&loginVal); err != nil {
 				return "", jwt.ErrMissingLoginValues
@@ -38,11 +40,13 @@ func GinJWTMiddlewareInit(jwtAuthorizator JwtAuthorizator) (authMiddleware *jwt.
 		},
 		Authorizator: jwtAuthorizator,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
+			log.Infof("%#v", data)
 			if v, ok := data.(*models.ExtraClaim); ok {
 				v.Claims = models.GetExtraClaims(v.UserName)
+				jsonClaims, _ := json.Marshal(v.Claims)
 				return jwt.MapClaims{
 					"UserName": v.UserName,
-					"Claims":   v.Claims,
+					"Claims":   string(jsonClaims),
 				}
 			}
 			return jwt.MapClaims{}
@@ -58,10 +62,12 @@ func GinJWTMiddlewareInit(jwtAuthorizator JwtAuthorizator) (authMiddleware *jwt.
 		RefreshResponse: nil,
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-
+			jsonClaim := claims["Claims"].(string)
+			var data []models.Claim
+			json.Unmarshal([]byte(jsonClaim), &data)
 			return &models.ExtraClaim{
 				UserName: claims["UserName"].(string),
-				Claims:   claims["Claims"].([]models.Claim),
+				Claims:   data,
 			}
 		},
 		IdentityKey:           indentity,

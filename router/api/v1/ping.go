@@ -14,7 +14,7 @@ func PingHandler(c *gin.Context) {
 	ctx := context.Background()
 	data, err := client.Ping(ctx)
 	if err != nil {
-		log.Error("Rpc call failed, err: %v", err)
+		log.Errorf("Rpc call failed, err: %v", err)
 		code := e.ERROR_RPC_CALL
 		c.JSON(http.StatusOK, gin.H{
 			"code": code,

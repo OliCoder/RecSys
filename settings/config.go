@@ -21,8 +21,9 @@ type Config struct {
 	LogDestination string
 	logFile        *os.File
 
-	RpcHost string
-	RpcPort string
+	RpcHost    string
+	RpcPort    string
+	EngineConf string
 
 	DBType      string
 	User        string
@@ -55,12 +56,14 @@ func GetConfigInstance() *Config {
 			LogDestination:     config.Section("log").Key("destination").MustString("./conf/default.ini"),
 			RpcHost:            config.Section("rpc").Key("host").MustString("127.0.0.1"),
 			RpcPort:            config.Section("rpc").Key("port").MustString("8001"),
+			EngineConf:         config.Section("rpc").Key("engine_conf").MustString("./conf/defaultEngineGroup.json"),
 			DBType:             config.Section("db").Key("dbtype").MustString("mysql"),
 			User:               config.Section("db").Key("user").MustString("root"),
 			Password:           config.Section("db").Key("password").MustString("123456"),
 			TablePrefix:        config.Section("db").Key("table_prefix").MustString("recsys_"),
 			DBHost:             config.Section("db").Key("server").MustString("127.0.0.1"),
 			DBPort:             config.Section("db").Key("port").MustString("3306"),
+			DBName:             config.Section("db").Key("name").MustString("recsys"),
 		}
 
 		// log config
