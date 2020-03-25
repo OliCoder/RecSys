@@ -42,3 +42,7 @@ func GetUserId(userName string) int {
 	db.Where("username = ?", userName).First(&auth)
 	return auth.UserId
 }
+
+func UpdateAuth(auth Auth) {
+	db.Save(&auth)
+}

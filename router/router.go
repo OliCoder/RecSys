@@ -28,6 +28,7 @@ func InitRouter() *gin.Engine {
 		user.POST("/logout", v1.Logout)
 	}
 	api := router.Group("/api/v1")
+	api.Use(authMiddleware.MiddlewareFunc())
 	{
 		api.GET("movie", v1.GetMovieLists)
 	}

@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"context"
 	"github.com/OliCoder/RecSys/e"
+	"github.com/OliCoder/RecSys/engine"
 	"github.com/OliCoder/RecSys/settings"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -45,9 +47,12 @@ func UpdateEngineInfo(c *gin.Context) {
 	} else {
 		log.Infof("Update engine group json: %v", req.Data)
 		EngineConf = req.Data
-		//client := engine.NewClient()
-		//ctx := context.Background()
-		//status, err := client.UpdateEngineGroup(ctx, req.Data)
+		client := engine.NewClient()
+		ctx := context.Background()
+		status, err := client.UpdateEngineGroup(ctx, req.Data)
+		if err != nil || status != true {
+			log.Errorf("Rcp call UpdateEngineGroup failed, err:%v, status:%v", err, status)
+		}
 	}
 
 	code := e.SUCCESS
