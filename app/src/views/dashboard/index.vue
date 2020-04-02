@@ -46,10 +46,10 @@ export default {
   data() {
     return {
       headerList: [
-        { name: '猜你喜欢', link: '/', key: 'movieRecommend' },
+        { name: '猜你喜欢', link: '/movie/recommend', key: 'movieRecommend' },
         // { name: '大家都在看', link: '/', key:'' },
-        { name: '评分最高', link: '/', key: 'movieTopRank' },
-        { name: '最近观看', link: '/', key: 'movieRecently' }
+        { name: '评分最高', link: '/movie/toprank', key: 'movieTopRank' },
+        { name: '最近观看', link: '/movie/recently', key: 'movieRecently' }
       ],
       defaultReq: {
         movie_recently_num: 5,
@@ -70,7 +70,6 @@ export default {
   },
   methods: {
     clearTmpList() {
-      console.log(this.rowList)
       delete this.rowList
       this.rowList = []
     },
@@ -113,6 +112,7 @@ export default {
   min-height: 36px;
   margin-bottom: 20px;
   padding: 5px;
+  opacity:0.8;
 }
 .bg-purple {
   background: #d3dce6;

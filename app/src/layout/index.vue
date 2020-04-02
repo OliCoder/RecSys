@@ -1,5 +1,8 @@
 <template>
   <div :class="classObj" class="app-wrapper">
+    <div class="bg">
+      <img :src="img" width="100%" height="100%">
+    </div>
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
     <sidebar class="sidebar-container" />
     <div class="main-container">
@@ -14,6 +17,7 @@
 <script>
 import { Navbar, Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
+import Img from '@/assets/bg.jpg'
 
 export default {
   name: 'Layout',
@@ -23,6 +27,11 @@ export default {
     AppMain
   },
   mixins: [ResizeMixin],
+  data() {
+    return {
+      img: Img
+    }
+  },
   computed: {
     sidebar() {
       return this.$store.state.app.sidebar
@@ -89,5 +98,11 @@ export default {
 
   .mobile .fixed-header {
     width: 100%;
+  }
+
+  .bg {
+    width: 100%;
+    height: 100%;
+    position: fixed;
   }
 </style>

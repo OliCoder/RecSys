@@ -15,6 +15,17 @@ export function getInfo() {
   })
 }
 
+export function updateUserInfo(data) {
+  return request({
+    url: '/user/info',
+    method: 'put',
+    data: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
 export function refreshToken() {
   return request({
     url: '/auth/refresh_token',

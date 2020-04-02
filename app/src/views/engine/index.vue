@@ -1,7 +1,7 @@
 <template>
   <div class="engine-container">
     <div class="engine-text">
-      <el-table border highlight-current-row align="center" :data="engineInfo['models']">
+      <el-table border highlight-current-row align="center" :data="engineInfo['models']" style="border-radius: 10px;">
         <el-table-column type="index" label="" />
         <el-table-column prop="name" label="Model Name" width="200px">
           <template slot-scope="scope">
@@ -106,7 +106,12 @@ export default {
 <style lang="scss" scoped>
 .engine {
   &-container {
-    margin: 30px;
+    margin: 10px;
+    border-radius: 4px;
+    min-height: 36px;
+    padding: 20px;
+    opacity:0.9;
+    background: #d3dce6;
   }
   &-text {
     font-size: 30px;
