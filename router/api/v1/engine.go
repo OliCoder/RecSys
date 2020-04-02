@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"github.com/OliCoder/RecSys/e"
 	"github.com/OliCoder/RecSys/engine"
 	"github.com/OliCoder/RecSys/settings"
@@ -10,12 +11,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 var EngineConf string
 
 type EngineGroupReq struct {
-	Data string `json:"data"`
+	Data interface{} `json:"data"`
 }
 
 func GetEngineInfo(c *gin.Context) {
@@ -41,20 +43,31 @@ func GetEngineInfo(c *gin.Context) {
 
 func UpdateEngineInfo(c *gin.Context) {
 	var req EngineGroupReq
-	err := c.BindJSON(&req)
+	err := c.Bind(&req.Data)
+	deleteSubStr := func(str, pattern string) string {
+		reg, _ := regexp.Compile(pattern)
+		return reg.ReplaceAllString(str, "")
+	}
 	if err != nil {
+		fmt.Println(err)
 		log.Errorf("get engine info from body failed, err:%v", err)
 	} else {
-		log.Infof("Update engine group json: %v", req.Data)
-		EngineConf = req.Data
+		log.Infof("Update engine group json: %v", req)
+		tmp := fmt.Sprintf("%#v", req.Data)
+		tmp = deleteSubStr(tmp, `map\[string\]interface \{\}`)
+		tmpByte := []byte(deleteSubStr(tmp, `\[\]interface \{\}`))
+		tmpByte[10] = '['
+		tmpByte[len(tmpByte)-2] = ']'
+
+		EngineConf = string(tmpByte)
 		client := engine.NewClient()
 		ctx := context.Background()
-		status, err := client.UpdateEngineGroup(ctx, req.Data)
+		status, err := client.UpdateEngineGroup(ctx, EngineConf)
 		if err != nil || status != true {
 			log.Errorf("Rcp call UpdateEngineGroup failed, err:%v, status:%v", err, status)
 		}
 	}
-
+	fmt.Println(EngineConf, req)
 	code := e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,

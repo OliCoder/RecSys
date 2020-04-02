@@ -1,58 +1,103 @@
 <template>
   <div class="engine-container">
     <div class="engine-text">
-      <el-table v-loading="engineLoading" align="center" :data="engineInfo">
-        <el-table-column fixed prop="name" label="模型名" width="100px"></el-table-column>
-        <el-table-column prop="params" label="参数" max-width="100px">
+      <el-table border highlight-current-row align="center" :data="engineInfo['models']">
+        <el-table-column type="index" label="" />
+        <el-table-column prop="name" label="Model Name" width="200px">
           <template slot-scope="scope">
-            <div>{{ scope.row.params }}</div>
-<!--            <div v-if="dataObject(scope.row.params)">-->
-<!--              <pre style="overflow:auto;"><code>{{ JSON.stringify(scope.row.params, null, 4).replace(/\"/g, "")}}</code></pre>-->
-<!--            </div>-->
-<!--            <div v-else>{{ scope.row.params }}</div>-->
+            <el-select v-model="scope.row.name" placeholder="Model">
+              <el-option v-for="item in algType" :key="item" :label="item" :value="item" />
+            </el-select>
           </template>
         </el-table-column>
-        <el-table-column prop="weight" label="权重" width="100px">
+        <el-table-column prop="params" label="Params">
           <template slot-scope="scope">
-            <div>{{ scope.row.weight }}</div>
+            <el-input v-model="scope.row.params" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="weight" label="Weight" width="201px">
+          <template slot-scope="scope">
+            <el-input-number v-model="scope.row.weight" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="inuse" label="Enable" width="75px">
+          <template slot-scope="scope">
+            <el-switch v-model="scope.row.inuse" active-color="#13ce66" inactive-color="#ff4949" />
           </template>
         </el-table-column>
       </el-table>
+      <div class="engine-button-container">
+        <el-button icon="el-icon-plus" @click="addList" />
+        <el-button type="primary" icon="el-icon-upload" @click="UpDateEngineInfo">Submit</el-button>
+        <router-link to="/">
+          <el-button type="danger" icon="el-icon-close">Close</el-button>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { getEngineInfo } from '@/api/engine'
+import { getEngineInfo, UpdateEngineGroups } from '@/api/engine'
 
 export default {
   data() {
     return {
-      engineInfo: null,
-      engineLoading: false
+      algType: [
+        'CONTENT',
+        'POPU',
+        'ALS'
+      ],
+      engineInfo: { 'model': [] },
+      engineLoading: false,
+      submitText: 'Submit',
+      submitLoading: false
     }
   },
   created() {
     this.fetchEngineInfo()
   },
   methods: {
+    addList() {
+      var sum = 0
+      this.engineInfo['models'].forEach(item => {
+        sum += item.weight
+      })
+      this.engineInfo['models'].unshift({ weight: 1 - sum })
+    },
     fetchEngineInfo() {
       this.engineLoading = true
       getEngineInfo().then(rsp => {
-        this.engineInfo = JSON.parse(rsp.data)["models"]
-        this.engineInfo.forEach(function (item, index) {
+        this.engineInfo = JSON.parse(rsp.data)
+        this.engineInfo['models'].forEach(function(item, index) {
           item.weight = item.params.weight
           delete item.params.weight
+          item.params = JSON.stringify(item.params)
+          item.inuse = true
         })
         this.engineLoading = false
       })
     },
-    dataObject(info) {
-      try {
-        return Object.prototype.toString.call(info) === "[object Object]";
-      } catch (e) {
-        return false;
-      }
+    UpDateEngineInfo() {
+      this.submitLoading = true
+      this.submitText = 'Loading'
+      this.engineInfo['models'] = this.engineInfo['models'].filter(item => item.inuse === true)
+
+      const engineInfo = JSON.parse(JSON.stringify(this.engineInfo))
+      engineInfo['models'].forEach(function(item, index) {
+        item.params = JSON.parse(item.params)
+        item.params.weight = item.weight
+        delete item.weight
+        delete item.inuse
+      })
+      UpdateEngineGroups(engineInfo).then(rsp => {
+        this.submitText = 'Submit'
+        this.submitLoading = false
+        this.$message({
+          message: 'Submit Engine Information Success!',
+          type: 'success'
+        })
+      })
     }
   }
 }
@@ -66,6 +111,9 @@ export default {
   &-text {
     font-size: 30px;
     line-height: 46px;
+  }
+  &-button-container {
+    text-align: right;
   }
 }
 </style>

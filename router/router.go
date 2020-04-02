@@ -30,7 +30,7 @@ func InitRouter() *gin.Engine {
 	api := router.Group("/api/v1")
 	api.Use(authMiddleware.MiddlewareFunc())
 	{
-		api.GET("movie", v1.GetMovieLists)
+		api.PUT("movie", v1.GetMovieLists)
 	}
 	admin := router.Group("/admin")
 	var adminMiddleware = jwt.GinJWTMiddlewareInit(jwt.AdminAuthorizator)

@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"fmt"
 )
 
 type GetMovieListReq struct {
@@ -29,6 +30,7 @@ func GetMovieLists(c *gin.Context) {
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Errorf("Parse GetMovieListReq failed, err:%v, req:%v", err, req)
+		fmt.Printf("Parse GetMovieListReq failed, err:%v, req:%v", err, req)
 		code := e.ERROR
 		c.JSON(http.StatusOK, gin.H{
 			"code": code,
@@ -37,14 +39,21 @@ func GetMovieLists(c *gin.Context) {
 		})
 		return
 	}
+	fmt.Println(req)
 	var movieRecentlyLists []models.Movie
-	movieRecentlyLists = models.GetMovieRecently(userId, req.MovieRecentlyNum)
+	if req.MovieRecentlyNum != 0 {
+		movieRecentlyLists = models.GetMovieRecently(userId, req.MovieRecentlyNum)
+	}
 
 	var movieTopRankLists []models.Movie
-	movieTopRankLists = models.GetMovieTopRank(userId, req.MovieTopRankNum)
+	if req.MovieTopRankNum != 0 {
+		movieTopRankLists = models.GetMovieTopRank(userId, req.MovieTopRankNum)
+	}
 
 	var movieRecommendLists []models.Movie
-	movieRecommendLists = models.GetMovieRecommend(userId, req.MovieRecommendNum)
+	if req.MovieRecommendNum != 0 {
+		movieRecommendLists = models.GetMovieRecommend(userId, req.MovieRecommendNum)
+	}
 
 	code := e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
