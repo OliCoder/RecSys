@@ -121,7 +121,7 @@ export const constantRoutes = [
     component: Layout,
     children: [
       {
-        path: 'https://https://github.com/OliCoder/RecSys/',
+        path: 'https://github.com/OliCoder/RecSys/',
         meta: { title: 'External Link', icon: 'link' }
       }
     ]

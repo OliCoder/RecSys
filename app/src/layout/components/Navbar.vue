@@ -16,10 +16,10 @@
               Home
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://https://github.com/OliCoder/RecSys/">
+          <a target="_blank" href="https://github.com/OliCoder/RecSys/">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
-          <a target="_blank" href="https://https://github.com/OliCoder/RecSys/">
+          <a target="_blank" href="https://github.com/OliCoder/RecSys/">
             <el-dropdown-item>Docs</el-dropdown-item>
           </a>
           <el-dropdown-item divided>
