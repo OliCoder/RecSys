@@ -12,6 +12,7 @@ type Movie struct {
 	Title     string  `json:"title"`
 	Genre     string  `json:"genre"`
 	AvgRating float32 `json:"avgrating" gorm:"column:avgrating"`
+	Img		  string  `json:"img"`
 	Rating    int     `json:"rating"`
 }
 
