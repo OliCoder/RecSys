@@ -9,9 +9,9 @@
               <el-col :span="4" :offset="idx> 0 ? 1 : 0">
                 <el-card>
                   <div class="block">
-                    <el-image fit="fill">
+                    <el-image fit="fill" :src="movie.img">
                       <div slot="error" class="image-slot">
-                        <i class="el-icon-picture-outline" />
+                        <el-image fit="fill" :src="errImg" />
                       </div>
                     </el-image>
                   </div>
@@ -33,6 +33,7 @@
 
 <script>
 import { getMovieLists } from '@/api/movies'
+import ErrImg from '@/assets/tmp.png'
 
 export default {
   name: 'Recently',
@@ -43,7 +44,8 @@ export default {
       },
       movieLoading: false,
       movieLists: [],
-      rowList: []
+      rowList: [],
+      errImg: ErrImg
     }
   },
   created() {
@@ -86,6 +88,12 @@ export default {
   }
   .bg-purple {
     background: #d3dce6;
+  }
+  .block {
+    /*width: 82px;*/
+    /*height: 120px;*/
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
   }
   .movie {
   &-title {

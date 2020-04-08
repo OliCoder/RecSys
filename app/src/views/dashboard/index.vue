@@ -54,7 +54,7 @@ export default {
       defaultReq: {
         movie_recently_num: 5,
         movie_top_rank_num: 10,
-        movie_recommend_num: 0
+        movie_recommend_num: 5
       },
       movieLoading: false,
       movieLists: {
