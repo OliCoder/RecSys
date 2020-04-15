@@ -12,7 +12,7 @@ type Movie struct {
 	Title     string  `json:"title"`
 	Genre     string  `json:"genre"`
 	AvgRating float32 `json:"avgrating" gorm:"column:avgrating"`
-	Img		  string  `json:"img"`
+	Img       string  `json:"img"`
 	Rating    int     `json:"rating"`
 }
 
@@ -73,6 +73,10 @@ func GetMovieRecommend(userId, num int) []Movie {
 	if err != nil {
 		log.Errorf("Rpc call Recommend failed, err:%v", err)
 	}
+	return GetMovieListsInfo(userId, movieIdList)
+}
+
+func GetMovieListsInfo(userId int, movieIdList []int64) []Movie {
 	movies := make([]Movie, len(movieIdList))
 	for idx, id := range movieIdList {
 		db.Where("movieid = ?", id).First(&movies[idx])

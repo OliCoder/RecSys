@@ -6,9 +6,12 @@ import (
 	"github.com/OliCoder/RecSys/models"
 	"github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"fmt"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type GetMovieListReq struct {
@@ -30,7 +33,6 @@ func GetMovieLists(c *gin.Context) {
 	err := c.BindJSON(&req)
 	if err != nil {
 		log.Errorf("Parse GetMovieListReq failed, err:%v, req:%v", err, req)
-		fmt.Printf("Parse GetMovieListReq failed, err:%v, req:%v", err, req)
 		code := e.ERROR
 		c.JSON(http.StatusOK, gin.H{
 			"code": code,
@@ -39,7 +41,7 @@ func GetMovieLists(c *gin.Context) {
 		})
 		return
 	}
-	fmt.Println(req)
+
 	var movieRecentlyLists []models.Movie
 	if req.MovieRecentlyNum != 0 {
 		movieRecentlyLists = models.GetMovieRecently(userId, req.MovieRecentlyNum)
@@ -52,7 +54,34 @@ func GetMovieLists(c *gin.Context) {
 
 	var movieRecommendLists []models.Movie
 	if req.MovieRecommendNum != 0 {
-		movieRecommendLists = models.GetMovieRecommend(userId, req.MovieRecommendNum)
+		key := strconv.Itoa(userId) + "#" + strconv.Itoa(req.MovieRecommendNum)
+		val, err := redisCli.Get(key).Result()
+		if err == redis.Nil {
+			movieRecommendLists = models.GetMovieRecommend(userId, req.MovieRecommendNum)
+			go func() {
+				val = ""
+				for _, id := range movieRecommendLists {
+					val += " " + strconv.FormatInt(id.MovieId, 10)
+				}
+				err := redisCli.Set(key, val[1:], time.Hour*24).Err()
+				if err != nil {
+					log.Errorf("Set redis key: %s failed, value: %s, err:%v", key, val[1:], err)
+				} else {
+					log.Infof("Set redis key: %s success, value: %s", key, val[1:])
+				}
+			}()
+		} else if err != nil {
+			log.Errorf("Get redis key: %v failed, err: %v", key, err)
+		} else {
+			log.Infof("Get redis key: %v success, val: %v", key, val)
+			tmp := strings.Split(val, " ")
+			var movieIdList []int64
+			for _, item := range tmp {
+				id, _ := strconv.ParseInt(item, 10, 64)
+				movieIdList = append(movieIdList, id)
+				movieRecommendLists = models.GetMovieListsInfo(userId, movieIdList)
+			}
+		}
 	}
 
 	code := e.SUCCESS
